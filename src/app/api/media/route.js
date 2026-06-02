@@ -6,7 +6,7 @@ import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase
 
 const COLLECTION = 'media';
 
-export async function GET() {
+export async function GET(request) {
   try {
     if (!db) {
       return Response.json(
@@ -14,10 +14,33 @@ export async function GET() {
         { status: 500 }
       );
     }
+    const { searchParams } = new URL(request.url);
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+
     const snap = await getDocs(collection(db, COLLECTION));
     const media = snap.docs.map(d => ({ firestoreId: d.id, id: d.id, ...d.data() }));
     // Sort media chronologically by id ascending
     media.sort((a, b) => (a.id || 0) - (b.id || 0));
+
+    if (pageParam !== null) {
+      const page = parseInt(pageParam || '1', 10);
+      const limit = parseInt(limitParam || '6', 10);
+      const total = media.length;
+      const totalPages = Math.ceil(total / limit);
+      const startIdx = (page - 1) * limit;
+      const endIdx = page * limit;
+      const paginatedData = media.slice(startIdx, endIdx);
+
+      return Response.json({
+        data: paginatedData,
+        total,
+        page,
+        limit,
+        totalPages
+      });
+    }
+
     return Response.json(media);
   } catch (err) {
     console.error('[media GET] Firestore error:', err);

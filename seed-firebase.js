@@ -82,14 +82,31 @@ const THOUGHTS = [
   { titleHi: "युवा और राजनीति में भागीदारी", titleEn: "Youth Participation in Politics", descHi: "सशक्त राष्ट्र निर्माण हेतु युवाओं की राजनैतिक चेतना और नेतृत्व क्षमता का विकास।", descEn: "Development of youth's political awareness and leadership capabilities for strong nation building.", status: "published", date: "2026-05-28", tags: ["Youth", "Politics"], views: 2900 },
   { titleHi: "UP शासन में डिजिटल क्रांति", titleEn: "Digital Revolution in UP Governance", descHi: "माननीय मुख्यमंत्री योगी आदित्यनाथ जी के नेतृत्व में उत्तर प्रदेश शासन की लोक-कल्याणकारी नीतियों की तीव्र डिजिटल पहुँच।", descEn: "How digitized public channels under CM Yogi Adityanath's leadership are optimizing citizen grievance redresses.", status: "published", date: "2026-06-01", tags: ["UP Govt", "Tech"], views: 4350 },
   { titleHi: "फतेहपुर में डिजिटल साक्षरता की नई अलख", titleEn: "Digital Literacy Campaign in Fatehpur", descHi: "ग्रामीण फतेहपुर के युवाओं को मुख्यधारा की डिजिटल तकनीक से जोड़ने और रोजगार के नए अवसर प्रदान करने का अभियान।", descEn: "A comprehensive drive connecting rural Fatehpur youth with core digital technologies and opening new career pathways.", status: "published", date: "2026-05-10", tags: ["Fatehpur", "Literacy"], views: 2450 },
-  { titleHi: "भारतीय राष्ट्रवाद और आज का युवा", titleEn: "Indian Nationalism and Modern Youth", descHi: "राष्ट्रवादी सोच and सांस्कृतिक विरासत के साथ आधुनिक तकनीक के समन्वय द्वारा भारत को विश्व गुरु बनाने का संकल्प।", descEn: "Harnessing nationalist values and cultural heritage alongside modern technology to strengthen youth contributions.", status: "published", date: "2026-05-25", tags: ["Nationalism", "Youth"], views: 4200 }
+  { titleHi: "भारतीय राष्ट्रवाद और आज का युवा", titleEn: "Indian Nationalism and Modern Youth", descHi: "राष्ट्रवादी सोच and सांस्कृतिक विरासत के साथ आधुनिक तकनीक के समन्वय द्वारा भारत को विश्व गुरु बनाने का संकल्प।", descEn: "Harnessing nationalist values and cultural heritage alongside modern technology to strengthen youth contributions.", status: "published", date: "2026-05-25", tags: ["Nationalism", "Youth"], views: 4200 },
+  { titleHi: "भारत का सांस्कृतिक पुनरुत्थान", titleEn: "India's Cultural Resurgence", descHi: "श्रीराम जन्मभूमि मंदिर निर्माण और भारत के सांस्कृतिक गौरव के नव-उत्थान पर समाजशास्त्रीय दृष्टिकोण।", descEn: "A sociological perspective on the construction of the Shri Ram Janmabhoomi Temple and India's cultural rebirth.", status: "published", date: "2026-05-15", tags: ["Culture", "Nationalism"], views: 3100 },
+  { titleHi: "नागरिकता कानून और जन-संवाद", titleEn: "Citizenship Law & Public Dialogue", descHi: "नागरिकता संशोधन अधिनियम (CAA) के प्रावधानों पर जन-चेतना और रचनात्मक संवाद की आवश्यकता।", descEn: "The necessity of public awareness and constructive dialogues around the Citizenship Amendment Act (CAA).", status: "published", date: "2026-04-20", tags: ["Governance", "Politics"], views: 2700 },
+  { titleHi: "डिजिटल साक्षरता से सशक्त नारी", titleEn: "Empowering Women via Digital Literacy", descHi: "ग्रामीण उत्तर प्रदेश की महिलाओं को ऑनलाइन माध्यमों और आत्मनिर्भरता योजनाओं से जोड़ने का विमर्श।", descEn: "Discussions on connecting rural UP women with online channels and self-reliance welfare programs.", status: "published", date: "2026-05-05", tags: ["Literacy", "Youth"], views: 1800 },
+  { titleHi: "भारतीय संस्कृति में योग और स्वास्थ्य की प्रासंगिकता", titleEn: "Relevance of Yoga & Health in Indian Culture", descHi: "आधुनिक जीवनशैली में तनाव मुक्ति और शारीरिक-मानसिक कल्याण के लिए पारंपरिक योग पद्धतियों के महत्व पर चर्चा।", descEn: "Discussions on the importance of traditional yoga practices for stress relief and physical-mental well-being in modern lifestyle.", status: "published", date: "2026-06-02", tags: ["Culture", "Wellness"], views: 1950 },
+  { titleHi: "डिजिटल इंडिया और आत्मनिर्भर उत्तर प्रदेश", titleEn: "Digital India & Self-Reliant Uttar Pradesh", descHi: "उत्तर प्रदेश को एक ट्रिलियन डॉलर अर्थव्यवस्था बनाने में डिजिटल तकनीक और स्टार्टअप इकोसिस्टम का योगदान।", descEn: "Contribution of digital technologies and startup ecosystems in making Uttar Pradesh a one-trillion-dollar economy.", status: "published", date: "2026-05-30", tags: ["Tech", "UP Govt"], views: 2150 },
+  { titleHi: "फतेहपुर में जल संरक्षण योजना और जनभागीदारी", titleEn: "Water Conservation & Public Participation in Fatehpur", descHi: "भूजल स्तर सुधारने और पारंपरिक जलाशयों के संरक्षण में ग्रामीण समुदायों की सक्रिय सहभागिता का महत्व।", descEn: "Importance of active rural community participation in improving groundwater levels and preserving traditional water reservoirs.", status: "published", date: "2026-05-12", tags: ["Fatehpur", "Conservation"], views: 1400 },
+  { titleHi: "स्वदेशी उत्पादों को बढ़ावा देने में युवाओं की भूमिका", titleEn: "Role of Youth in Promoting Swadeshi Products", descHi: "स्थानीय कला, शिल्प और कुटीर उद्योगों को डिजिटल प्लेटफॉर्म के जरिए वैश्विक पहचान दिलाने का युवाओं का संकल्प।", descEn: "Youth's resolution to give global identity to local art, craft, and cottage industries through digital platforms.", status: "published", date: "2026-05-18", tags: ["Youth", "Self-Reliance"], views: 1720 },
+  { titleHi: "राष्ट्र प्रथम: हमारा संकल्प, हमारा पथ", titleEn: "Nation First: Our Resolution, Our Path", descHi: "राष्ट्र की एकता, अखंडता और सुरक्षा के प्रति नागरिक कर्तव्यों और सामाजिक मूल्यों का निर्वहन।", descEn: "Upholding citizen duties and social values towards the unity, integrity, and security of the nation.", status: "published", date: "2026-06-03", tags: ["Nationalism", "Governance"], views: 3200 }
 ];
 
 const MEDIA = [
   { title: "UP सरकार की डिजिटल नीति पर विशेष साक्षात्कार", outlet: "Dainik Jagran", type: "interview", date: "2026-03-10" },
   { title: "Social Media Monitoring in Governance", outlet: "The Hindu", type: "article", date: "2026-01-22" },
   { title: "कश्मीर अध्ययन: मीडिया रिपोर्ट", outlet: "Aaj Tak", type: "video", date: "2025-11-05" },
-  { title: "BJP Youth Leadership Panel Discussion", outlet: "Republic Bharat", type: "video", date: "2025-09-18" }
+  { title: "BJP Youth Leadership Panel Discussion", outlet: "Republic Bharat", type: "video", date: "2025-09-18" },
+  { title: "साइबर सुरक्षा एवं अफवाहों पर रोकथाम पर मीडिया वक्तव्य", outlet: "News18 UP", type: "interview", date: "2026-04-05" },
+  { title: "डिजिटल साक्षरता और युवा रोजगार अवसर", outlet: "Amar Ujala", type: "article", date: "2026-04-18" },
+  { title: "यूपी में सोशल मीडिया सेल का योगदान", outlet: "Zee News", type: "video", date: "2026-05-12" },
+  { title: "Voter Mobilization in Uttar Pradesh Rural Hubs", outlet: "Indian Express", type: "article", date: "2026-05-29" },
+  { title: "फतेहपुर में स्वास्थ्य शिविरों के सफल आयोजन पर विशेष कवरेज", outlet: "Amar Ujala", type: "article", date: "2026-04-25" },
+  { title: "डिजिटल मॉनिटरिंग और सुरक्षा व्यवस्था पर संगोष्ठी में संबोधन", outlet: "Dainik Bhaskar", type: "article", date: "2026-05-15" },
+  { title: "BJP organizational meeting and youth outreach in Bindki Tehsil", outlet: "News Nation", type: "video", date: "2026-05-22" },
+  { title: "Interview: Balancing technology with grassroots social service in UP", outlet: "The Pioneer", type: "interview", date: "2026-05-02" },
+  { title: "राष्ट्रवादी पत्रकारिता एवं समाज निर्माण में मीडिया का योगदान", outlet: "Hindusthan Samachar", type: "article", date: "2026-06-01" }
 ];
 
 const COMMUNITY = [
@@ -156,6 +173,70 @@ const COMMUNITY = [
     iconBg: "bg-[#E6F1FB] text-[#185FA5]",
     detailsHi: "<h3><strong>वंचित वर्गों के लिए न्याय की सुलभता</strong></h3><p>आर्थिक रूप से कमजोर वर्गों को कानूनी जटिलताओं से राहत दिलाने और त्वरित समाधान खोजने के लिए कानूनी विशेषज्ञों की एक टीम के साथ परामर्श अभियान।</p><h4>मुख्य उपलब्धियां:</h4><ul><li><strong>त्वरित परामर्श:</strong> बुनियादी संपत्ति विवादों, पारिवारिक मामलों और सरकारी लाभों की फाइलिंग से जुड़े मामलों के निवारण के लिए 24 विशेष परामर्श शिविरों का आयोजन।</li><li><strong>कानूनी साक्षरता:</strong> 10 से अधिक ग्रामीण क्षेत्रों में कानूनी जागरूकता पुस्तिकाएं वितरित कर जनचेतना का प्रसार।</li></ul>",
     detailsEn: "<h3><strong>Access to Justice for Underprivileged Sections</strong></h3><p>An advisory drive organized with certified legal professionals to support the economically weaker groups with legal clarity and conflict resolutions.</p><h4>Key Impact Metrics:</h4><ul><li><strong>Direct Resolutions:</strong> Conducted 24 consultation drives addressing basic property disputes, familial matters, and governmental benefit filings.</li><li><strong>Legal Literacy:</strong> Disseminated legal rights booklets in simple Hindi text to improve general legal literacy in over 10 surrounding villages.</li></ul>"
+  },
+  {
+    titleHi: "स्वास्थ्य एवं कल्याण शिविर",
+    titleEn: "Health & Wellness Camps",
+    beneficiariesHi: "3,000+ ग्रामीण नागरिक",
+    beneficiariesEn: "3,000+ Rural Citizens",
+    areaHi: "फतेहपुर तहसील",
+    areaEn: "Fatehpur Tehsil",
+    year: "2023–24",
+    descHi: "फतेहपुर के ग्रामीण क्षेत्रों में निःशुल्क स्वास्थ्य जाँच, परामर्श और दवा वितरण शिविरों का आयोजन।",
+    descEn: "Organised free health checkups, physician consultations, and medicine distribution camps across Fatehpur villages.",
+    icon: "🏥",
+    accent: "card-accent-blue",
+    iconBg: "bg-[#E6F1FB] text-[#185FA5]",
+    detailsHi: "<h3><strong>ग्रामीण स्वास्थ्य सेवा सुधार अभियान</strong></h3><p>ग्रामीण क्षेत्रों में स्वास्थ्य सुविधाओं की सुगम पहुँच सुनिश्चित करने के लिए चिकित्सा विशेषज्ञों के सहयोग से निःशुल्क स्वास्थ्य शिविरों का सफल आयोजन।</p><h4>मुख्य प्रभाव:</h4><ul><li><strong>निःशुल्क जाँच व परामर्श:</strong> 3,000 से अधिक ग्रामीणों की जाँच और निःशुल्क औषधियों का वितरण।</li><li><strong>विशेषज्ञ परामर्श:</strong> हृदय रोग, नेत्र रोग और सामान्य चिकित्सा के वरिष्ठ डॉक्टरों द्वारा परामर्श।</li></ul>",
+    detailsEn: "<h3><strong>Rural Health Service Improvement Campaign</strong></h3><p>Successfully organized free medical camps in cooperation with healthcare specialists to ensure accessible diagnostics in remote villages.</p><h4>Key Milestones:</h4><ul><li><strong>Diagnostics & Care:</strong> Provided free health checkups and distributed essential medicines to over 3,000 rural residents.</li><li><strong>Specialist Consultations:</strong> Brought cardiologists, ophthalmologists, and general physicians directly to rural sub-centers.</li></ul>"
+  },
+  {
+    titleHi: "पर्यावरण संरक्षण एवं वृक्षारोपण",
+    titleEn: "Environment Protection & Greenery Drive",
+    beneficiariesHi: "10,000+ पौधे रोपित",
+    beneficiariesEn: "10,000+ Saplings Planted",
+    areaHi: "फतेहपुर जनपद",
+    areaEn: "Fatehpur District",
+    year: "2024",
+    descHi: "पर्यावरण संरक्षण हेतु वृहद वृक्षारोपण अभियान और जल संरक्षण जागरूकता गोष्ठियों का आयोजन।",
+    descEn: "Led a mass tree plantation drive and organized water conservation awareness workshops in Bindki and Fatehpur.",
+    icon: "🌱",
+    accent: "card-accent-green",
+    iconBg: "bg-[#E1F5EE] text-[#1D9E75]",
+    detailsHi: "<h3><strong>हरित फतेहपुर अभियान</strong></h3><p>जलवायु परिवर्तन की चुनौतियों से निपटने और हरित आवरण बढ़ाने के लिए स्थानीय स्कूलों, सामाजिक संस्थाओं और कार्यकर्ताओं के सहयोग से वृहद अभियान।</p><h4>मुख्य उपलब्धियां:</h4><ul><li><strong>वृक्षारोपण:</strong> फतेहपुर जनपद के विभिन्न गांवों और सड़कों के किनारे 10,000 से अधिक छायादार और फलदार पौधों का रोपण।</li><li><strong>जल संरक्षण:</strong> जल संचयन और तालाबों के पुनरुद्धार हेतु जनजागरण अभियान।</li></ul>",
+    detailsEn: "<h3><strong>Green Fatehpur Campaign</strong></h3><p>A community-driven greening movement organized in collaboration with local schools, NGOs, and youth clubs to combat environmental degradation.</p><h4>Key Achievements:</h4><ul><li><strong>Mass Plantation:</strong> Planted over 10,000 shade and fruit-bearing saplings along village paths and school premises.</li><li><strong>Conservation Workshops:</strong> Educated citizens on rain-water harvesting methods and pond restoration techniques.</li></ul>"
+  },
+  {
+    titleHi: "जल संरक्षण एवं तालाब पुनरुद्धार अभियान",
+    titleEn: "Water Conservation & Pond Revival Campaign",
+    beneficiariesHi: "4,000+ ग्रामीण परिवार",
+    beneficiariesEn: "4,000+ Rural Families",
+    areaHi: "बिन्दकी एवं फतेहपुर ब्लॉक",
+    areaEn: "Bindki & Fatehpur Blocks",
+    year: "2024–Present",
+    descHi: "पारंपरिक तालाबों के पुनरुद्धार, जल संचयन प्रणालियों की स्थापना और ग्रामीण क्षेत्रों में जल स्तर सुधारने का अभियान।",
+    descEn: "A community drive to restore traditional water bodies and set up rain-water harvesting systems for rural farming.",
+    icon: "💧",
+    accent: "card-accent-blue",
+    iconBg: "bg-[#E6F1FB] text-[#185FA5]",
+    detailsHi: "<h3><strong>जल संचयन और भूजल स्तर सुधार पहल</strong></h3><p>फतेहपुर जिले में गिरते भूजल स्तर की समस्या के समाधान के लिए स्थानीय किसानों और स्वयंसेवकों के सहयोग से तालाबों का जीर्णोद्धार किया गया।</p><h4>मुख्य परिणाम:</h4><ul><li><strong>तालाब पुनरुद्धार:</strong> 12 प्राचीन तालाबों की सिल्ट निकालकर उन्हें जल संग्रहण के अनुकूल बनाया गया।</li><li><strong>वर्षा जल संचयन:</strong> 15 ग्रामीण सरकारी स्कूलों में वॉटर हार्वेस्टिंग सिस्टम की स्थापना।</li></ul>",
+    detailsEn: "<h3><strong>Water Conservation & Groundwater Rejuvenation</strong></h3><p>Initiated a volunteer-led scheme to address the depleting water table in Fatehpur by reviving community water reservoirs.</p><h4>Key Results:</h4><ul><li><strong>Pond Revival:</strong> Successfully de-silted and revived 12 historic village ponds to retain monsoon runoff.</li><li><strong>School Systems:</strong> Set up rooftop rainwater harvesting units in 15 rural state schools.</li></ul>"
+  },
+  {
+    titleHi: "स्वदेशी रोजगार मेला",
+    titleEn: "Swadeshi Employment Fair",
+    beneficiariesHi: "1,500+ स्थानीय युवा",
+    beneficiariesEn: "1,500+ Local Youths",
+    areaHi: "फतेहपुर जनपद",
+    areaEn: "Fatehpur District",
+    year: "2023",
+    descHi: "स्थानीय उद्योगों, कुटीर उद्योगों और कौशल विकास संस्थानों को युवाओं से जोड़कर रोजगार के नवीन अवसरों का सृजन।",
+    descEn: "Connecting local crafts, cottage industries, and skill development bodies with rural youth to generate jobs.",
+    icon: "💼",
+    accent: "card-accent-saffron",
+    iconBg: "bg-[#FAEEDA] text-[#BA7517]",
+    detailsHi: "<h3><strong>आत्मनिर्भर फतेहपुर की दिशा में एक कदम</strong></h3><p>प्रधानमंत्री के आत्मनिर्भर भारत अभियान से प्रेरित होकर स्थानीय स्तर पर कौशल विकास और रोजगार मेला आयोजित किया गया।</p><h4>मुख्य विशेषताएं:</h4><ul><li><strong>उद्योगों का समन्वय:</strong> 30 से अधिक स्थानीय लघु उद्योगों और हस्तशिल्प समितियों ने मेले में सहभागिता की।</li><li><strong>कौशल पंजीकरण:</strong> 1,500 से अधिक युवाओं को विभिन्न कौशल प्रशिक्षण कार्यक्रमों के लिए नामांकित किया गया।</li></ul>",
+    detailsEn: "<h3><strong>Steps towards a Self-Reliant Fatehpur</strong></h3><p>Inspired by the 'Atmanirbhar Bharat' vision, this fair aimed at promoting local cottage industries and providing job options in UP.</p><h4>Key Highlights:</h4><ul><li><strong>Industry Linkage:</strong> Collaborated with 30+ regional micro-enterprises and handicraft cooperative bodies.</li><li><strong>Skill Enrollment:</strong> Enrolled over 1,500 candidates into certified vocational and digital skill development courses.</li></ul>"
   }
 ];
 
@@ -171,7 +252,15 @@ const GALLERY = [
   { src: "/gallery_field_visit.png", cat: "field", captionHi: "फील्ड विजिट — ग्रामीण क्षेत्र का निरीक्षण", captionEn: "Field Visit — Rural Area Inspection" },
   { src: "/gallery_meeting.png", cat: "meeting", captionHi: "संगठनात्मक बैठक — कार्यकर्ताओं के साथ संवाद", captionEn: "Organizational Meeting — Discussion with Workers" },
   { src: "/gallery_public_interaction.png", cat: "public", captionHi: "जन संपर्क — जन कल्याण एवं जन-सुनवाई", captionEn: "Public Interaction — Community welfare and hearings" },
-  { src: "/gallery_learning.png", cat: "learning", captionHi: "सीखने के पल — शासकीय व नीति अनुसंधान", captionEn: "Learning Moments — Governance & Policy Research" }
+  { src: "/gallery_learning.png", cat: "learning", captionHi: "सीखने के पल — शासकीय व नीति अनुसंधान", captionEn: "Learning Moments — Governance & Policy Research" },
+  { src: "/gallery_field_visit.png", cat: "field", captionHi: "फील्ड विजिट — किसान संवाद एवं जन-सुनवाई", captionEn: "Field Visit — Farmer Interactions & Grievance Redressal" },
+  { src: "/gallery_meeting.png", cat: "meeting", captionHi: "जिला स्तरीय समीक्षा बैठक — प्रशासनिक अधिकारियों के साथ", captionEn: "District Review Meeting — With Administrative Officers" },
+  { src: "/gallery_public_interaction.png", cat: "public", captionHi: "जन संपर्क — बिन्दकी तहसील में नागरिक संवाद", captionEn: "Public Interaction — Citizen Dialogues in Bindki Tehsil" },
+  { src: "/gallery_learning.png", cat: "learning", captionHi: "नीति अनुसंधान — राष्ट्रीय सुरक्षा और डिजिटल मीडिया संगोष्ठी", captionEn: "Policy Research — National Security & Digital Media Seminar" },
+  { src: "/gallery_field_visit.png", cat: "field", captionHi: "फतेहपुर ग्रामीण विकास परियोजनाओं का निरीक्षण", captionEn: "Inspection of Fatehpur Rural Development Projects" },
+  { src: "/gallery_meeting.png", cat: "meeting", captionHi: "बीजेपी युवा मोर्चा सांगठनिक बैठक", captionEn: "BJP Youth Wing Organizational Meeting" },
+  { src: "/gallery_public_interaction.png", cat: "public", captionHi: "जन संपर्क — मतदाता पंजीकरण शिविर फतेहपुर", captionEn: "Public Interaction — Voter Registration Camp Fatehpur" },
+  { src: "/gallery_learning.png", cat: "learning", captionHi: "शोध अध्ययन — जम्मू-कश्मीर अध्ययन केंद्र संगोष्ठी", captionEn: "Research Study — J&K Study Centre Symposium" }
 ];
 
 const ORGANIZATIONAL = [

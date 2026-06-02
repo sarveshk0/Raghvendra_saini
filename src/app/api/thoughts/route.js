@@ -1,5 +1,6 @@
 /**
  * Thoughts API Route — Pure Cloud Firestore
+ * Supports: search, category, status, page, limit query params on GET
  */
 import { db } from '../../../lib/firebase';
 import {
@@ -15,7 +16,7 @@ import {
 
 const COLLECTION = 'thoughts';
 
-export async function GET() {
+export async function GET(request) {
   try {
     if (!db) {
       return Response.json(
@@ -23,12 +24,66 @@ export async function GET() {
         { status: 500 }
       );
     }
+
+    const { searchParams } = new URL(request.url);
+    const search   = (searchParams.get('search')   || '').toLowerCase().trim();
+    const category = (searchParams.get('category') || '').toLowerCase().trim();
+    const status   = (searchParams.get('status')   || '').toLowerCase().trim();
+    const page     = Math.max(1, parseInt(searchParams.get('page')  || '1', 10));
+    const limit    = Math.max(0, parseInt(searchParams.get('limit') || '0', 10)); // 0 = no limit / return all
+
     const q = query(collection(db, COLLECTION), orderBy('date', 'desc'));
     const snap = await getDocs(q);
-    
+
     // Map document IDs to firestoreId and id to be fully compatible with frontend states
-    const thoughts = snap.docs.map(d => ({ firestoreId: d.id, id: d.id, ...d.data() }));
-    return Response.json(thoughts);
+    let thoughts = snap.docs.map(d => ({ firestoreId: d.id, id: d.id, ...d.data() }));
+
+    // ── Filter by search (title Hindi / English / tags) ──────────────────────
+    if (search) {
+      thoughts = thoughts.filter(t =>
+        (t.titleHi || '').toLowerCase().includes(search) ||
+        (t.titleEn || '').toLowerCase().includes(search) ||
+        (t.descHi  || '').toLowerCase().includes(search) ||
+        (t.descEn  || '').toLowerCase().includes(search) ||
+        (Array.isArray(t.tags) && t.tags.some(tag => tag.toLowerCase().includes(search)))
+      );
+    }
+
+    // ── Filter by category (tags-based) ──────────────────────────────────────
+    if (category && category !== 'all') {
+      thoughts = thoughts.filter(t =>
+        Array.isArray(t.tags) && t.tags.some(tag => tag.toLowerCase() === category)
+      );
+    }
+
+    // ── Filter by status ──────────────────────────────────────────────────────
+    if (status && status !== 'all') {
+      thoughts = thoughts.filter(t => (t.status || '').toLowerCase() === status);
+    }
+
+    const total = thoughts.length;
+
+    // ── Pagination ────────────────────────────────────────────────────────────
+    let paginated = thoughts;
+    let totalPages = 1;
+    if (limit > 0) {
+      totalPages = Math.max(1, Math.ceil(total / limit));
+      const safeP = Math.min(page, totalPages);
+      paginated = thoughts.slice((safeP - 1) * limit, safeP * limit);
+    }
+
+    // If no pagination requested, return bare array for backward compatibility
+    if (limit === 0 && !search && !category && !status) {
+      return Response.json(thoughts);
+    }
+
+    return Response.json({
+      data: paginated,
+      total,
+      page,
+      totalPages,
+      limit
+    });
   } catch (err) {
     console.error('[thoughts GET] Firestore error:', err);
     return Response.json({ error: err.message }, { status: 500 });

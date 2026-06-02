@@ -149,7 +149,7 @@ const TABS = [
   { id: "rss_work", label: "RSS Org Work", icon: "🌸" },
   { id: "media", label: "Media Coverage", icon: "📰" },
   { id: "community", label: "Community", icon: "🤝" },
-  { id: "documents", label: "Documents", icon: "📁" },
+  { id: "gallery", label: "Gallery", icon: "📸" },
   { id: "analytics", label: "Analytics", icon: "📊" },
   { id: "settings", label: "Settings", icon: "⚙️" },
 ];
@@ -192,12 +192,10 @@ const SectionHeader = ({ title, action, actionLabel }) => (
 );
 
 // ── DASHBOARD SCREEN ───────────────────────────────────────────────────────────
-const Dashboard = ({ profile, thoughts, media, docs }) => {
+const Dashboard = ({ profile, thoughts, media }) => {
   const publishedThoughts = thoughts.filter(t => t.status === "published").length;
   const draftThoughts = thoughts.filter(t => t.status === "draft").length;
   const mediaCount = media.length;
-  const docsCount = docs.length;
-  const privateDocs = docs.filter(d => !d.pub).length;
 
   return (
     <div>
@@ -209,7 +207,6 @@ const Dashboard = ({ profile, thoughts, media, docs }) => {
         <StatCard icon="👁️" label="Profile Views" value="17,020" sub="Combined analytics" color={COLOR.saffron} />
         <StatCard icon="💭" label="Thoughts Published" value={publishedThoughts} sub={`${draftThoughts} drafts pending`} color={COLOR.navy} />
         <StatCard icon="📰" label="Media Mentions" value={mediaCount} sub="Last 6 months" color={COLOR.green} />
-        <StatCard icon="📁" label="Documents" value={docsCount} sub={`${privateDocs} private vault`} color={COLOR.purple} />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
@@ -457,6 +454,11 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
   const [descHiDraft, setDescHiDraft] = useState("");
   const [descEnDraft, setDescEnDraft] = useState("");
 
+  // Search / Filter / Pagination states (moved up to avoid Rules of Hooks violation on early return)
+  const [search, setSearch]       = useState("");
+  const [catFilter, setCatFilter] = useState("all");
+  const [page, setPage]           = useState(1);
+
   const handleDescHiDraftChange = (val) => {
     setDescHiDraft(val);
     setDescHi(autoDetectAndFormatHTML(val));
@@ -491,7 +493,8 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
     }, 50);
   };
 
-  const filtered = filter === "all" ? thoughts : thoughts.filter(t => t.status === filter);
+
+
 
   const startWriteNew = () => {
     setEditingId(null);
@@ -699,42 +702,193 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
     </div>
   );
 
+  // ── Search / Filter / Pagination states ──────────────────────────────────
+  const PAGE_SIZE = 12;
+
+  // Derive all unique tag-categories from loaded thoughts
+  const allCategories = [...new Set(thoughts.flatMap(t => t.tags || []))].filter(Boolean);
+
+  // Apply search + category + status filters client-side (data already in state)
+  const afterSearch = search
+    ? thoughts.filter(t =>
+        (t.titleHi || "").toLowerCase().includes(search.toLowerCase()) ||
+        (t.titleEn || "").toLowerCase().includes(search.toLowerCase()) ||
+        (t.descHi  || "").toLowerCase().includes(search.toLowerCase()) ||
+        (Array.isArray(t.tags) && t.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())))
+      )
+    : thoughts;
+
+  const afterCat = catFilter === "all"
+    ? afterSearch
+    : afterSearch.filter(t => Array.isArray(t.tags) && t.tags.includes(catFilter));
+
+  const afterStatus = filter === "all"
+    ? afterCat
+    : afterCat.filter(t => t.status === filter);
+
+  const totalPages   = Math.max(1, Math.ceil(afterStatus.length / PAGE_SIZE));
+  const safePage     = Math.min(page, totalPages);
+  const paginated    = afterStatus.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  // Reset to page 1 whenever filters change
+  const handleSearch = (val) => { setSearch(val); setPage(1); };
+  const handleFilter = (val) => { setFilter(val); setPage(1); };
+  const handleCat    = (val) => { setCatFilter(val); setPage(1); };
+
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#2C2C2A" }}>My Thoughts — मेरे विचार</div>
-        <button onClick={startWriteNew} style={{ background: COLOR.saffron, color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ New Post</button>
+
+      {/* ── TOP BAR ─────────────────────────────────────────────────────── */}
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
+
+        {/* Search */}
+        <div style={{ flex: "1 1 200px", position: "relative" }}>
+          <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "#888780" }}>🔍</span>
+          <input
+            value={search}
+            onChange={e => handleSearch(e.target.value)}
+            placeholder="Search thoughts..."
+            style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px 8px 32px", outline: "none", boxSizing: "border-box", background: "#fff" }}
+          />
+        </div>
+
+        {/* Category Filter */}
+        <select
+          value={catFilter}
+          onChange={e => handleCat(e.target.value)}
+          style={{ fontSize: 12, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", background: "#fff", cursor: "pointer", height: 36 }}
+        >
+          <option value="all">📂 All Categories</option>
+          {allCategories.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+
+        {/* Status Filter */}
+        <select
+          value={filter}
+          onChange={e => handleFilter(e.target.value)}
+          style={{ fontSize: 12, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", background: "#fff", cursor: "pointer", height: 36 }}
+        >
+          <option value="all">🗂 All Status</option>
+          <option value="published">✅ Published</option>
+          <option value="draft">📝 Draft</option>
+          <option value="scheduled">📅 Scheduled</option>
+        </select>
+
+        {/* Add New */}
+        <button
+          onClick={startWriteNew}
+          style={{ background: COLOR.saffron, color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", height: 36 }}
+        >
+          + Add New
+        </button>
       </div>
-      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-        {["all", "published", "draft", "scheduled"].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{ fontSize: 12, padding: "5px 12px", borderRadius: 8, border: "0.5px solid", borderColor: filter === f ? COLOR.saffron : "#d3d1c7", background: filter === f ? COLOR.saffronLight : "#fff", color: filter === f ? COLOR.saffronDark : "#5F5E5A", cursor: "pointer", fontWeight: filter === f ? 600 : 400, textTransform: "capitalize" }}>{f}</button>
-        ))}
+
+      {/* Results count */}
+      <div style={{ fontSize: 12, color: "#888780", marginBottom: 12 }}>
+        Showing {paginated.length} of {afterStatus.length} thoughts
+        {search && <span> · search: "<b>{search}</b>"</span>}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {filtered.map(t => (
-          <div key={t.id} style={{ background: "#fff", border: "0.5px solid #e5e3dc", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "flex-start", gap: 14 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#2C2C2A" }}>{t.titleHi}</div>
-              <div style={{ fontSize: 12, color: "#888780", marginTop: 2 }}>{t.titleEn} · {t.date}</div>
-              {t.descHi && <div style={{ fontSize: 12, color: "#5F5E5A", marginTop: 6, lineHeight: 1.5 }}>{t.descHi}</div>}
-              <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                {t.tags && t.tags.map(tag => <Badge key={tag} color="gray">{tag}</Badge>)}
+
+      {/* ── CARDS GRID ──────────────────────────────────────────────────── */}
+      {paginated.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "48px 0", color: "#888780", fontSize: 14 }}>
+          No thoughts found. Try a different filter or{" "}
+          <span onClick={startWriteNew} style={{ color: COLOR.saffron, cursor: "pointer", fontWeight: 600 }}>write a new one</span>.
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14, marginBottom: 20 }}>
+          {paginated.map(t => (
+            <div
+              key={t.id}
+              style={{ background: "#fff", border: "0.5px solid #e5e3dc", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", transition: "box-shadow 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.09)"}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"}
+            >
+              {/* Status badge + views */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Badge color={t.status === "published" ? "green" : t.status === "draft" ? "amber" : "blue"}>
+                  {t.status}
+                </Badge>
+                {t.views > 0 && <span style={{ fontSize: 11, color: "#888780" }}>👁 {t.views.toLocaleString()}</span>}
+              </div>
+
+              {/* Titles */}
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#2C2C2A", lineHeight: 1.4 }}>{t.titleHi}</div>
+                {t.titleEn && <div style={{ fontSize: 12, color: "#888780", marginTop: 2 }}>{t.titleEn}</div>}
+              </div>
+
+              {/* Description excerpt */}
+              {t.descHi && (
+                <div style={{ fontSize: 12, color: "#5F5E5A", lineHeight: 1.55, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}
+                  dangerouslySetInnerHTML={{ __html: t.descHi }}
+                />
+              )}
+
+              {/* Tags */}
+              {t.tags && t.tags.length > 0 && (
+                <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                  {t.tags.slice(0, 4).map(tag => <Badge key={tag} color="gray">{tag}</Badge>)}
+                </div>
+              )}
+
+              {/* Footer: date + actions */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", paddingTop: 6, borderTop: "0.5px solid #f0ede5" }}>
+                <span style={{ fontSize: 11, color: "#aaa9a4" }}>📅 {t.date}</span>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={() => startEdit(t)} style={{ background: "#f5f4f0", border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>✏️ Edit</button>
+                  <button onClick={() => handleDelete(t.id)} style={{ background: "#FCEBEB", border: "0.5px solid #f7c1c1", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: COLOR.red, cursor: "pointer" }}>🗑</button>
+                </div>
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-              <Badge color={t.status === "published" ? "green" : t.status === "draft" ? "amber" : "blue"}>{t.status}</Badge>
-              {t.views > 0 && <div style={{ fontSize: 11, color: "#888780" }}>👁 {t.views.toLocaleString()}</div>}
-              <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
-                <button onClick={() => startEdit(t)} style={{ background: "#f5f4f0", border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "3px 8px", fontSize: 11, cursor: "pointer" }}>✏️</button>
-                <button onClick={() => handleDelete(t.id)} style={{ background: "#FCEBEB", border: "0.5px solid #f7c1c1", borderRadius: 6, padding: "3px 8px", fontSize: 11, color: COLOR.red, cursor: "pointer" }}>🗑</button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── PAGINATION ──────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flexWrap: "wrap" }}>
+          {/* Prev */}
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={safePage === 1}
+            style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8, border: "0.5px solid #d3d1c7", background: safePage === 1 ? "#f5f4f0" : "#fff", color: safePage === 1 ? "#aaa" : "#2C2C2A", cursor: safePage === 1 ? "default" : "pointer", fontWeight: 600 }}
+          >« Prev</button>
+
+          {/* Page numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
+            const isActive = p === safePage;
+            // Show first, last, current ±1, and ellipsis
+            const show = p === 1 || p === totalPages || Math.abs(p - safePage) <= 1;
+            if (!show) {
+              const showEllipsis = p === 2 || p === totalPages - 1;
+              return showEllipsis ? <span key={p} style={{ fontSize: 12, color: "#aaa", padding: "0 2px" }}>…</span> : null;
+            }
+            return (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                style={{ fontSize: 12, width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${isActive ? COLOR.saffron : "#d3d1c7"}`, background: isActive ? COLOR.saffron : "#fff", color: isActive ? "#fff" : "#2C2C2A", cursor: "pointer", fontWeight: isActive ? 700 : 400 }}
+              >{p}</button>
+            );
+          })}
+
+          {/* Next */}
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={safePage === totalPages}
+            style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8, border: "0.5px solid #d3d1c7", background: safePage === totalPages ? "#f5f4f0" : "#fff", color: safePage === totalPages ? "#aaa" : "#2C2C2A", cursor: safePage === totalPages ? "default" : "pointer", fontWeight: 600 }}
+          >Next »</button>
+        </div>
+      )}
+
     </div>
   );
 };
+
+
 
 // ── JOURNEY & RSS TIMELINE SCREEN ──────────────────────────────────────────────
 const Political = ({ timeline, onSaveRole, onDeleteRole }) => {
@@ -1479,109 +1633,6 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
   );
 };
 
-// ── DOCUMENTS VAULT SCREEN ─────────────────────────────────────────────────────
-const Documents = ({ docs, onSaveDoc, onDeleteDoc }) => {
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [name, setName] = useState("");
-  const [cat, setCat] = useState("certificate");
-  const [pub, setPub] = useState(true);
-
-  const handleAdd = async () => {
-    if (!name) {
-      alert("Please fill document name");
-      return;
-    }
-    const docPayload = {
-      name,
-      cat,
-      pub,
-      date: new Date().toISOString().split('T')[0]
-    };
-    await onSaveDoc(docPayload);
-    setName("");
-    setCat("certificate");
-    setPub(true);
-    setShowAddForm(false);
-  };
-
-  const handleTogglePublic = async (d) => {
-    const updatedPayload = {
-      id: d.id,
-      pub: !d.pub
-    };
-    await onSaveDoc(updatedPayload);
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this document from the vault?")) {
-      await onDeleteDoc(id);
-    }
-  };
-
-  return (
-    <div>
-      <SectionHeader title="Document Vault" actionLabel="Upload Doc" action={() => setShowAddForm(true)} />
-      
-      {showAddForm && (
-        <div style={{ background: "#fff", border: "0.5px solid #e5e3dc", borderRadius: 12, padding: 20, marginBottom: 16 }}>
-          <SectionHeader title="📄 Upload/Register Document" />
-          <div style={{ marginBottom: 10 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: "#888780" }}>DOCUMENT NAME</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Appointment Order — UP Home Dept.pdf" style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "6px 10px", outline: "none", boxSizing: "border-box" }} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#888780" }}>CATEGORY</label>
-              <select value={cat} onChange={e => setCat(e.target.value)} style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "6px 10px", outline: "none", height: "32px" }}>
-                <option value="certificate">Degree/Certificate</option>
-                <option value="appointment">Appointment Letter</option>
-                <option value="research">Research / Reports</option>
-                <option value="id">ID Credentials</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#888780" }}>INITIAL VISIBILITY</label>
-              <select value={pub ? "yes" : "no"} onChange={e => setPub(e.target.value === "yes")} style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "6px 10px", outline: "none", height: "32px" }}>
-                <option value="yes">Public on Website</option>
-                <option value="no">Private Vault Only</option>
-              </select>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={handleAdd} style={{ background: COLOR.green, color: "#fff", border: "none", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontWeight: 600 }}>Save Document</button>
-            <button onClick={() => setShowAddForm(false)} style={{ background: "#f5f4f0", border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      <div style={{ border: `2px dashed ${COLOR.saffron}60`, borderRadius: 12, padding: 20, textAlign: "center", marginBottom: 16, background: COLOR.saffronLight }}>
-        <div style={{ fontSize: 24, marginBottom: 6 }}>📤</div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.saffronDark }}>Drag & drop files here</div>
-        <div style={{ fontSize: 11, color: "#888780", marginTop: 3 }}>PDF, JPG, PNG, DOCX · Max 10MB each</div>
-      </div>
-      
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {docs.map(d => (
-          <div key={d.id} style={{ background: "#fff", border: "0.5px solid #e5e3dc", borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ fontSize: 18 }}>📄</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: "#2C2C2A" }}>{d.name}</div>
-              <div style={{ fontSize: 11, color: "#888780", marginTop: 2 }}>{d.cat} · {d.date}</div>
-            </div>
-            <button onClick={() => handleTogglePublic(d)} style={{ border: "none", background: "none", padding: 0, cursor: "pointer" }}>
-              <Badge color={d.pub ? "green" : "gray"}>{d.pub ? "Public" : "Private"}</Badge>
-            </button>
-            <div style={{ display: "flex", gap: 6 }}>
-              <button style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: "0.5px solid #d3d1c7", background: "#f5f4f0", cursor: "pointer" }}>⬇ Download</button>
-              <button onClick={() => handleDelete(d.id)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, border: "0.5px solid #f7c1c1", background: "#FCEBEB", color: COLOR.red, cursor: "pointer" }}>🗑</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 // ── ANALYTICS SCREEN ───────────────────────────────────────────────────────────
 const Analytics = ({ analytics }) => {
   const months = analytics?.months || ["Jan", "Feb", "Mar", "Apr", "May"];
@@ -1623,7 +1674,6 @@ const Analytics = ({ analytics }) => {
 const Settings = ({ settings, onSaveSettings }) => {
   const [lang, setLang] = useState(settings?.lang || "hindi");
   const [privacyProfile, setPrivacyProfile] = useState(settings?.privacyProfile !== undefined ? settings.privacyProfile : true);
-  const [privacyDocs, setPrivacyDocs] = useState(settings?.privacyDocs !== undefined ? settings.privacyDocs : false);
 
   const handleLangChange = async (l) => {
     setLang(l);
@@ -1636,13 +1686,11 @@ const Settings = ({ settings, onSaveSettings }) => {
   const handleToggle = async (key, currentVal) => {
     const updatedVal = !currentVal;
     if (key === "privacyProfile") setPrivacyProfile(updatedVal);
-    if (key === "privacyDocs") setPrivacyDocs(updatedVal);
 
     await onSaveSettings({
       ...settings,
       lang,
       privacyProfile,
-      privacyDocs,
       [key]: updatedVal
     });
   };
@@ -1667,7 +1715,6 @@ const Settings = ({ settings, onSaveSettings }) => {
         <div style={{ fontSize: 14, fontWeight: 600, color: "#2C2C2A", marginBottom: 14 }}>🔒 Privacy Controls</div>
         {[
           { label: "Show profile publicly", sub: "Name, photo, bio visible to all", on: privacyProfile, tog: () => handleToggle("privacyProfile", privacyProfile) },
-          { label: "Show documents publicly", sub: "Only approved docs shown", on: privacyDocs, tog: () => handleToggle("privacyDocs", privacyDocs) },
           { label: "Show contact details", sub: "Phone & email on public page", on: settings?.showContact || true, tog: () => handleToggle("showContact", settings?.showContact || true) },
         ].map(s => (
           <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "0.5px solid #f0ede5" }}>
@@ -1788,6 +1835,344 @@ const RSSWork = ({ orgWork, onSaveOrgWork, onDeleteOrgWork }) => {
   );
 };
 
+// ── GALLERY SCREEN ────────────────────────────────────────────────────────────
+const AdminGallery = () => {
+  const [gallery, setGallery] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+
+  // Form states
+  const [src, setSrc] = useState("");
+  const [cat, setCat] = useState("field");
+  const [captionHi, setCaptionHi] = useState("");
+  const [captionEn, setCaptionEn] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const fetchGallery = async () => {
+    setLoading(true);
+    try {
+      const catQuery = categoryFilter === "all" ? "" : `&category=${categoryFilter}`;
+      const res = await fetch(`/api/gallery?page=${page}&limit=8${catQuery}`);
+      const data = await res.json();
+      setGallery(data.data || []);
+      setTotalPages(data.totalPages || 1);
+    } catch (error) {
+      console.error("Error fetching gallery items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGallery();
+  }, [page, categoryFilter]);
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async ev => {
+        const base64 = ev.target.result;
+        try {
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ file: base64 })
+          });
+          const data = await res.json();
+          if (data.url) {
+            setSrc(data.url);
+          } else {
+            alert("Upload failed: " + (data.error || "Unknown error"));
+          }
+        } catch (err) {
+          console.error("Upload fetch error:", err);
+          alert("Upload failed: Network error");
+        } finally {
+          setUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Image loading error:", err);
+      alert("Failed to read image file.");
+      setUploading(false);
+    }
+  };
+
+  const startWriteNew = () => {
+    setEditingItem(null);
+    setSrc("");
+    setCat("field");
+    setCaptionHi("");
+    setCaptionEn("");
+    setShowForm(true);
+  };
+
+  const startEdit = (item) => {
+    setEditingItem(item);
+    setSrc(item.src || "");
+    setCat(item.cat || "field");
+    setCaptionHi(item.captionHi || "");
+    setCaptionEn(item.captionEn || "");
+    setShowForm(true);
+  };
+
+  const cancelForm = () => {
+    setSrc("");
+    setCat("field");
+    setCaptionHi("");
+    setCaptionEn("");
+    setEditingItem(null);
+    setShowForm(false);
+  };
+
+  const handleSave = async () => {
+    if (!src) {
+      alert("Please select or paste an image source first.");
+      return;
+    }
+    const payload = {
+      src,
+      cat,
+      captionHi,
+      captionEn,
+    };
+    if (editingItem) {
+      payload.id = editingItem.id || editingItem.docId;
+      payload.firestoreId = editingItem.firestoreId || editingItem.docId || editingItem.id;
+    }
+    try {
+      const res = await fetch("/api/gallery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        cancelForm();
+        fetchGallery();
+      } else {
+        const errData = await res.json();
+        alert("Save failed: " + (errData.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Error saving gallery item:", err);
+    }
+  };
+
+  const handleDelete = async (item) => {
+    const id = item.firestoreId || item.docId || item.id;
+    if (!window.confirm("Are you sure you want to delete this gallery item?")) return;
+    try {
+      const res = await fetch(`/api/gallery?id=${id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        fetchGallery();
+      } else {
+        const errData = await res.json();
+        alert("Delete failed: " + (errData.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Error deleting gallery item:", err);
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "#2C2C2A" }}>Campaign Photo Gallery — फोटो गैलरी</div>
+        {!showForm && (
+          <button onClick={startWriteNew} style={{ background: COLOR.saffron, color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ Add Photo</button>
+        )}
+      </div>
+
+      {showForm && (
+        <div style={{ background: "#fff", border: "0.5px solid #e5e3dc", borderRadius: 12, padding: 20, marginBottom: 16 }}>
+          <SectionHeader title={editingItem ? "✏️ Edit Photo Details" : "📸 Add Photo to Gallery"} />
+          
+          <div style={{ background: "#fff", border: `1.5px solid ${COLOR.saffron}30`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#2C2C2A", marginBottom: 10 }}>🖼️ Photo Source</div>
+            <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+              <div style={{ width: 140, height: 100, borderRadius: 10, overflow: "hidden", border: `2px solid ${COLOR.saffron}40`, flexShrink: 0, background: COLOR.saffronLight, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                {src ? (
+                  <img src={src} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: uploading ? 0.5 : 1 }} />
+                ) : (
+                  <span style={{ fontSize: 28, opacity: 0.4 }}>📷</span>
+                )}
+                {uploading && (
+                  <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>⏳ Uploading...</div>
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>PASTE DIRECT IMAGE URL</label>
+                <input
+                  type="url"
+                  value={src}
+                  onChange={e => setSrc(e.target.value)}
+                  placeholder="https://example.com/photo.jpg"
+                  disabled={uploading}
+                  style={{ width: "100%", fontSize: 12, border: `1.5px solid ${COLOR.saffron}`, borderRadius: 8, padding: "7px 10px", outline: "none", boxSizing: "border-box", marginBottom: 8, background: uploading ? "#f5f4f0" : "#fff" }}
+                />
+                <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>OR UPLOAD FROM DEVICE</label>
+                <label style={{ display: "inline-flex", alignItems: "center", gap: 6, background: COLOR.saffronLight, color: COLOR.saffronDark, border: `1px solid ${COLOR.saffron}40`, borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.6 : 1 }}>
+                  {uploading ? "⏳ Uploading..." : "📁 Choose Photo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={uploading}
+                    style={{ display: "none" }}
+                    onChange={e => handleImageUpload(e.target.files[0])}
+                  />
+                </label>
+                {src && !uploading && (
+                  <button
+                    onClick={() => setSrc("")}
+                    style={{ marginLeft: 8, fontSize: 11, color: COLOR.red, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
+                  >
+                    ✕ Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginBottom: 12 }}>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>GALLERY CATEGORY</label>
+              <select value={cat} onChange={e => setCat(e.target.value)} style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", height: "40px" }}>
+                <option value="field">Field Visit (फील्ड विजिट)</option>
+                <option value="meeting">Meetings (बैठकें)</option>
+                <option value="public">Public Contact (जन संपर्क)</option>
+                <option value="learning">Learning (सीखने के पल)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>CAPTION (HINDI / हिंदी)</label>
+              <input value={captionHi} onChange={e => setCaptionHi(e.target.value)} placeholder="चित्र का विवरण हिंदी में लिखें..." style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", boxSizing: "border-box" }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>CAPTION (ENGLISH)</label>
+              <input value={captionEn} onChange={e => setCaptionEn(e.target.value)} placeholder="English caption..." style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", boxSizing: "border-box" }} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={handleSave} style={{ background: COLOR.green, color: "#fff", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 12, cursor: "pointer", fontWeight: 600 }}>{editingItem ? "✓ Save Changes" : "Save Photo"}</button>
+            <button onClick={cancelForm} style={{ background: "#f5f4f0", border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "9px 18px", fontSize: 12, cursor: "pointer" }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {!showForm && (
+        <>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
+            <select
+              value={categoryFilter}
+              onChange={e => { setCategoryFilter(e.target.value); setPage(1); }}
+              style={{ fontSize: 12, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", background: "#fff", cursor: "pointer", height: 36 }}
+            >
+              <option value="all">📂 All Categories</option>
+              <option value="field">🌲 Field Visit (फील्ड विजिट)</option>
+              <option value="meeting">🤝 Meetings (बैठकें)</option>
+              <option value="public">📢 Public Contact (जन संपर्क)</option>
+              <option value="learning">💡 Learning (सीखने के पल)</option>
+            </select>
+          </div>
+
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "48px 0" }}>
+              <div className="animate-spin" style={{ width: 34, height: 34, border: `3px solid ${COLOR.saffron}30`, borderTopColor: COLOR.saffron, borderRadius: "50%", margin: "0 auto 10px" }} />
+              <div style={{ fontSize: 12, color: "#888780" }}>Loading gallery photos...</div>
+            </div>
+          ) : gallery.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 0", color: "#888780", fontSize: 14 }}>
+              No photos found. Try a different filter or{" "}
+              <span onClick={startWriteNew} style={{ color: COLOR.saffron, cursor: "pointer", fontWeight: 600 }}>add a new photo</span>.
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16, marginBottom: 20 }}>
+                {gallery.map(item => (
+                  <div
+                    key={item.id}
+                    style={{ background: "#fff", border: "0.5px solid #e5e3dc", borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", transition: "box-shadow 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.09)"}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"}
+                  >
+                    <div style={{ height: 160, position: "relative", overflow: "hidden", background: "#f0ede5" }}>
+                      <img src={item.src} alt={item.captionEn || "Gallery Image"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <div style={{ position: "absolute", top: 10, right: 10 }}>
+                        <Badge color={item.cat === "meeting" ? "blue" : item.cat === "public" ? "purple" : item.cat === "learning" ? "amber" : "green"}>
+                          {item.cat}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#2C2C2A", lineHeight: 1.4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                        {item.captionHi || "—"}
+                      </div>
+                      {item.captionEn && (
+                        <div style={{ fontSize: 11, color: "#888780", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                          {item.captionEn}
+                        </div>
+                      )}
+                      
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", paddingTop: 8, borderTop: "0.5px solid #f0ede5" }}>
+                        <span style={{ fontSize: 10, color: "#aaa9a4" }}>ID: {item.id}</span>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <button onClick={() => startEdit(item)} style={{ background: "#f5f4f0", border: "0.5px solid #d3d1c7", borderRadius: 6, padding: "4px 8px", fontSize: 11, cursor: "pointer" }}>✏️ Edit</button>
+                          <button onClick={() => handleDelete(item)} style={{ background: "#FCEBEB", border: "0.5px solid #f7c1c1", borderRadius: 6, padding: "4px 8px", fontSize: 11, color: COLOR.red, cursor: "pointer" }}>🗑</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flexWrap: "wrap", marginTop: 20 }}>
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8, border: "0.5px solid #d3d1c7", background: page === 1 ? "#f5f4f0" : "#fff", color: page === 1 ? "#aaa" : "#2C2C2A", cursor: page === 1 ? "default" : "pointer", fontWeight: 600 }}
+                  >« Prev</button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
+                    const isActive = p === page;
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setPage(p)}
+                        style={{ fontSize: 12, width: 32, height: 32, borderRadius: 8, border: `0.5px solid ${isActive ? COLOR.saffron : "#d3d1c7"}`, background: isActive ? COLOR.saffron : "#fff", color: isActive ? "#fff" : "#2C2C2A", cursor: "pointer", fontWeight: 600 }}
+                      >{p}</button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8, border: "0.5px solid #d3d1c7", background: page === totalPages ? "#f5f4f0" : "#fff", color: page === totalPages ? "#aaa" : "#2C2C2A", cursor: page === totalPages ? "default" : "pointer", fontWeight: 600 }}
+                  >Next »</button>
+                </div>
+              )}
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App() {
   const router = useRouter();
@@ -1806,7 +2191,6 @@ export default function App() {
   const [orgWork, setOrgWork] = useState([]);
   const [media, setMedia] = useState([]);
   const [community, setCommunity] = useState([]);
-  const [docs, setDocs] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1819,7 +2203,6 @@ export default function App() {
         timelineRes,
         mediaRes,
         communityRes,
-        docsRes,
         analyticsRes,
         settingsRes,
         orgWorkRes
@@ -1829,7 +2212,6 @@ export default function App() {
         fetch("/api/timeline").then(r => r.json()),
         fetch("/api/media").then(r => r.json()),
         fetch("/api/community").then(r => r.json()),
-        fetch("/api/documents").then(r => r.json()),
         fetch("/api/analytics").then(r => r.json()),
         fetch("/api/settings").then(r => r.json()),
         fetch("/api/organizational").then(r => r.json())
@@ -1840,7 +2222,6 @@ export default function App() {
       setTimeline(Array.isArray(timelineRes) ? timelineRes : []);
       setMedia(Array.isArray(mediaRes) ? mediaRes : []);
       setCommunity(Array.isArray(communityRes) ? communityRes : []);
-      setDocs(Array.isArray(docsRes) ? docsRes : []);
       setAnalytics(analyticsRes);
       setSettings(settingsRes);
       setOrgWork(Array.isArray(orgWorkRes) ? orgWorkRes : []);
@@ -2041,32 +2422,6 @@ export default function App() {
     }
   };
 
-  const handleSaveDoc = async (doc) => {
-    try {
-      const res = await fetch("/api/documents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(doc)
-      });
-      const data = await res.json();
-      setDocs(Array.isArray(data.data) ? data.data : []);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleDeleteDoc = async (id) => {
-    try {
-      const res = await fetch(`/api/documents?id=${id}`, {
-        method: "DELETE"
-      });
-      const data = await res.json();
-      setDocs(Array.isArray(data.data) ? data.data : []);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const handleSaveSettings = async (updatedSettings) => {
     try {
       const res = await fetch("/api/settings", {
@@ -2082,19 +2437,19 @@ export default function App() {
   };
 
   const SCREENS = {
-    dashboard: () => <Dashboard profile={profile} thoughts={thoughts} media={media} docs={docs} />,
+    dashboard: () => <Dashboard profile={profile} thoughts={thoughts} media={media} />,
     profile: () => <Profile profile={profile} onSaveProfile={handleSaveProfile} />,
     thoughts: () => <Thoughts thoughts={thoughts} onSaveThought={handleSaveThought} onDeleteThought={handleDeleteThought} />,
     political: () => <Political timeline={timeline} onSaveRole={handleSaveRole} onDeleteRole={handleDeleteRole} />,
     rss_work: () => <RSSWork orgWork={orgWork} onSaveOrgWork={handleSaveOrgWork} onDeleteOrgWork={handleDeleteOrgWork} />,
     media: () => <Media media={media} onSaveMedia={handleSaveMedia} onDeleteMedia={handleDeleteMedia} />,
     community: () => <Community community={community} onSaveCommunity={handleSaveCommunity} onDeleteCommunity={handleDeleteCommunity} />,
-    documents: () => <Documents docs={docs} onSaveDoc={handleSaveDoc} onDeleteDoc={handleDeleteDoc} />,
+    gallery: () => <AdminGallery />,
     analytics: () => <Analytics analytics={analytics} />,
     settings: () => <Settings settings={settings} onSaveSettings={handleSaveSettings} />
   };
 
-  const Screen = SCREENS[activeTab] || (() => <Dashboard profile={profile} thoughts={thoughts} media={media} docs={docs} />);
+  const Screen = SCREENS[activeTab] || (() => <Dashboard profile={profile} thoughts={thoughts} media={media} />);
 
   if (authChecking) {
     return (
