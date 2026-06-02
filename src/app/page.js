@@ -7,6 +7,8 @@ import AnimatedSection from "../components/AnimatedSection";
 import CounterStat from "../components/CounterStat";
 import Tilt3DCard from "../components/Tilt3DCard";
 import QuoteMarquee from "../components/QuoteMarquee";
+import Navbar from "../components/Navbar";
+import OrgAchievements from "../components/OrgAchievements";
 
 // ============================================================
 // TRANSLATIONS — unchanged from original
@@ -167,47 +169,7 @@ function ScrollToTop() {
   );
 }
 
-// ============================================================
-// MOBILE NAV
-// ============================================================
-function MobileNav({ isOpen, onClose, t, lang, setLang }) {
-  if (!isOpen) return null;
-  const links = [
-    { href: "#about", label: t.navAbout },
-    { href: "#journey", label: t.navJourney },
-    { href: "#work", label: t.navWork },
-    { href: "#thoughts", label: t.navThoughts },
-    { href: "#gallery", label: t.navGallery },
-    { href: "#contact", label: t.navContact },
-  ];
-
-  return (
-    <div className="mobile-nav-overlay" onClick={onClose}>
-      <div className="flex flex-col items-center gap-6" onClick={(e) => e.stopPropagation()}>
-        {/* Logo */}
-        <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#EF9F27] to-[#1D9E75] flex items-center justify-center text-white font-black text-xl shadow-lg mb-4">
-          RS
-        </div>
-        {links.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            onClick={onClose}
-            className="text-white text-2xl font-bold tracking-wide hover:text-[#EF9F27] transition-colors"
-          >
-            {link.label}
-          </a>
-        ))}
-        <div className="flex gap-3 mt-4">
-          <button onClick={() => { setLang("hi"); onClose(); }} className={`px-5 py-2 rounded-xl font-bold text-sm transition-all ${lang === "hi" ? "bg-[#EF9F27] text-white" : "bg-white/10 text-white/70"}`}>हिंदी</button>
-          <button onClick={() => { setLang("en"); onClose(); }} className={`px-5 py-2 rounded-xl font-bold text-sm transition-all ${lang === "en" ? "bg-[#185FA5] text-white" : "bg-white/10 text-white/70"}`}>ENG</button>
-        </div>
-
-        <button onClick={onClose} className="mt-4 text-white/40 hover:text-white text-sm">✕ Close</button>
-      </div>
-    </div>
-  );
-}
+// Unified Navbar replaces separate MobileNav
 
 // ============================================================
 // MAIN PAGE COMPONENT
@@ -297,13 +259,7 @@ export default function Home() {
     <>
       <LotusOpening onReveal={() => setIntroRevealed(true)} />
 
-      <MobileNav
-        isOpen={mobileNavOpen}
-        onClose={() => setMobileNavOpen(false)}
-        t={t}
-        lang={lang}
-        setLang={setLang}
-      />
+      <Navbar lang={lang} setLang={setLang} />
 
       <ScrollToTop />
 
@@ -311,64 +267,6 @@ export default function Home() {
         className={`min-h-screen bg-[#FAFAF7] text-[#2C2C2A] font-sans antialiased selection:bg-[#EF9F27]/30 selection:text-[#BA7517] transition-opacity duration-[1500ms] ease-out ${introRevealed ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
       >
-
-        {/* ── NAVBAR ── */}
-        <header className="sticky top-0 z-50 bg-[#FAFAF7]/90 backdrop-blur-lg border-b border-[#e5e3dc]/80 shadow-sm transition-all duration-200">
-          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#EF9F27] to-[#1D9E75] flex items-center justify-center text-white font-bold text-sm tracking-wider shadow-md animate-pulse-glow">
-                RS
-              </div>
-              <div>
-                <span className="font-bold text-base tracking-wide text-[#2C2C2A] block leading-none">
-                  {lang === "hi" ? "राघवेन्द्र सैनी" : "RAGHVENDRA SAINI"}
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#EF9F27] mt-0.5 block">
-                  {lang === "hi" ? "राष्ट्रवादी कार्यकर्ता" : "POLITICAL LEADER"}
-                </span>
-              </div>
-            </div>
-
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#5F5E5A]">
-              {[
-                { href: "#about", label: t.navAbout },
-                { href: "#journey", label: t.navJourney },
-                { href: "#work", label: t.navWork },
-                { href: "#thoughts", label: t.navThoughts },
-                { href: "#gallery", label: t.navGallery },
-                { href: "#contact", label: t.navContact },
-              ].map(link => (
-                <a key={link.href} href={link.href} className="hover:text-[#EF9F27] transition-colors relative group">
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#EF9F27] group-hover:w-full transition-all duration-300 rounded" />
-                </a>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-3">
-              {/* Language Switch */}
-              <div className="hidden sm:flex bg-[#f0ede5] p-0.5 rounded-lg gap-1 shadow-inner border border-[#d3d1c7]">
-                <button onClick={() => setLang("hi")} className={`text-[11px] font-bold px-2.5 py-1 rounded-md transition-all ${lang === "hi" ? "bg-[#EF9F27] text-white shadow" : "text-[#5F5E5A] hover:bg-[#e2dfd5]"}`}>हिंदी</button>
-                <button onClick={() => setLang("en")} className={`text-[11px] font-bold px-2.5 py-1 rounded-md transition-all ${lang === "en" ? "bg-[#185FA5] text-white shadow" : "text-[#5F5E5A] hover:bg-[#e2dfd5]"}`}>ENG</button>
-              </div>
-
-
-
-              {/* Hamburger */}
-              <button
-                id="mobile-menu-btn"
-                onClick={() => setMobileNavOpen(true)}
-                className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-[#f0ede5] transition-colors"
-                aria-label="Open menu"
-              >
-                <span className="w-5 h-0.5 bg-[#2C2C2A] rounded" />
-                <span className="w-5 h-0.5 bg-[#2C2C2A] rounded" />
-                <span className="w-5 h-0.5 bg-[#2C2C2A] rounded" />
-              </button>
-            </div>
-          </div>
-        </header>
 
         {/* ── HERO SECTION ── */}
         <section id="about" className="relative overflow-hidden pt-10 pb-10 md:pt-14 md:pb-14">
@@ -580,40 +478,7 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div className="max-w-5xl mx-auto">
-                <AnimatedSection className="text-center mb-8">
-                  <h2 className="text-3xl md:text-4xl font-extrabold text-[#2C2C2A] tracking-tight gradient-text">
-                    {lang === "hi" ? "सांगठनिक कार्य और सहभागिता" : "RSS & Organizational Contributions"}
-                  </h2>
-                  <p className="text-sm text-[#5F5E5A] mt-3 max-w-xl mx-auto leading-relaxed">
-                    {lang === "hi" 
-                      ? "संघ के वरिष्ठ प्रचारकों के सानिध्य में गंगा संरक्षण, राष्ट्रोत्थान, वैचारिक चेतना और सामाजिक सेवा के विविध संकल्प" 
-                      : "Honoring service achievements alongside senior RSS pracharaks in national integration, environmental, and socio-cultural works"}
-                  </p>
-                </AnimatedSection>
-
-                {/* Grid of 20 RSS Pracharak Contributions */}
-                <div className="grid gap-6 sm:grid-cols-2 mt-10">
-                  {dynamicOrgWork.map((item, idx) => (
-                    <AnimatedSection key={item.id || idx} delay={idx * 30} direction="up">
-                      <Tilt3DCard
-                        intensity={6}
-                        glare={true}
-                        className="bg-white border border-[#e5e3dc] rounded-2xl p-6 shadow-sm hover:border-[#EF9F27]/30 transition-all flex gap-4 items-start h-full"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#EF9F27] to-[#BA7517] flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md shadow-[#EF9F27]/25">
-                          {idx + 1}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[13px] sm:text-[14px] font-bold text-[#2C2C2A] leading-relaxed">
-                            {lang === "hi" ? item.titleHi : item.titleEn}
-                          </p>
-                        </div>
-                      </Tilt3DCard>
-                    </AnimatedSection>
-                  ))}
-                </div>
-              </div>
+              <OrgAchievements dynamicOrgWork={dynamicOrgWork} lang={lang} />
             )}
           </div>
         </section>

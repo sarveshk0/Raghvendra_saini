@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "../../lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import Navbar from "../../components/Navbar";
 
 const COLOR = {
   saffron: "#EF9F27",
@@ -1792,6 +1793,7 @@ export default function App() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [lang, setLang] = useState("hi");
 
   // Secure Authentication States
   const [user, setUser] = useState(null);
@@ -2123,121 +2125,125 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "'Segoe UI', system-ui, sans-serif", background: "#F8F7F2", overflow: "hidden" }}>
-      {/* Sidebar */}
-      <div style={{ width: sidebarOpen ? 220 : 60, background: "#1a1a18", transition: "width 0.25s", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
-        <div style={{ padding: sidebarOpen ? "18px 16px 12px" : "18px 10px 12px", borderBottom: "0.5px solid #333330" }}>
-          {sidebarOpen ? (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "'Segoe UI', system-ui, sans-serif", background: "#F8F7F2" }}>
+      <Navbar lang={lang} setLang={setLang} />
+      
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        {/* Sidebar */}
+        <div style={{ width: sidebarOpen ? 220 : 60, background: "#1a1a18", transition: "width 0.25s", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
+          <div style={{ padding: sidebarOpen ? "18px 16px 12px" : "18px 10px 12px", borderBottom: "0.5px solid #333330" }}>
+            {sidebarOpen ? (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: COLOR.saffron, letterSpacing: "0.04em" }}>RAGHVENDRA SAINI</div>
+                <div style={{ fontSize: 10, color: "#888780", marginTop: 2 }}>Admin Portal Cell</div>
+              </div>
+            ) : (
+              <div style={{ width: 34, height: 34, borderRadius: "50%", background: COLOR.saffronLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: COLOR.saffronDark }}>RS</div>
+            )}
+          </div>
+          <nav style={{ flex: 1, padding: "8px 0", overflowY: "auto" }}>
+            {TABS.map(t => (
+              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: sidebarOpen ? "9px 16px" : "9px 0", justifyContent: sidebarOpen ? "flex-start" : "center", background: activeTab === t.id ? "#2c2c29" : "none", border: "none", cursor: "pointer", textAlign: "left", position: "relative" }}>
+                {activeTab === t.id && <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: COLOR.saffron, borderRadius: "0 2px 2px 0" }} />}
+                <span style={{ fontSize: 16 }}>{t.icon}</span>
+                {sidebarOpen && <span style={{ fontSize: 13, color: activeTab === t.id ? "#fff" : "#888780", fontWeight: activeTab === t.id ? 600 : 400 }}>{t.label}</span>}
+              </button>
+            ))}
+          </nav>
+          {/* Logout Button in Sidebar */}
+          <button
+            onClick={async () => {
+              if (auth) {
+                await signOut(auth);
+              }
+              localStorage.removeItem("mock_admin_auth");
+              router.push("/login");
+            }}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: sidebarOpen ? "12px 16px" : "12px 0",
+              justifyContent: sidebarOpen ? "flex-start" : "center",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left",
+              borderTop: "0.5px solid #333330",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#2c2c29";
+              const span = e.currentTarget.querySelector('.logout-text');
+              if (span) span.style.color = COLOR.red;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              const span = e.currentTarget.querySelector('.logout-text');
+              if (span) span.style.color = "#888780";
+            }}
+          >
+            <span style={{ fontSize: 16 }}>🔒</span>
+            {sidebarOpen && (
+              <span
+                className="logout-text"
+                style={{
+                  fontSize: 13,
+                  color: "#888780",
+                  fontWeight: 600,
+                  transition: "color 0.2s"
+                }}
+              >
+                Log Out
+              </span>
+            )}
+          </button>
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ padding: "12px 0", background: "none", border: "none", cursor: "pointer", color: "#888780", fontSize: 16, borderTop: "0.5px solid #333330" }}>
+            {sidebarOpen ? "◀" : "▶"}
+          </button>
+        </div>
+
+        {/* Main */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          {/* Topbar */}
+          <div style={{ background: "#fff", borderBottom: "0.5px solid #e5e3dc", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: COLOR.saffron, letterSpacing: "0.04em" }}>RAGHVENDRA SAINI</div>
-              <div style={{ fontSize: 10, color: "#888780", marginTop: 2 }}>Admin Portal Cell</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#2C2C2A" }}>{TABS.find(t => t.id === activeTab)?.icon} {TABS.find(t => t.id === activeTab)?.label}</div>
             </div>
-          ) : (
-            <div style={{ width: 34, height: 34, borderRadius: "50%", background: COLOR.saffronLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: COLOR.saffronDark }}>RS</div>
-          )}
-        </div>
-        <nav style={{ flex: 1, padding: "8px 0", overflowY: "auto" }}>
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: sidebarOpen ? "9px 16px" : "9px 0", justifyContent: sidebarOpen ? "flex-start" : "center", background: activeTab === t.id ? "#2c2c29" : "none", border: "none", cursor: "pointer", textAlign: "left", position: "relative" }}>
-              {activeTab === t.id && <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: COLOR.saffron, borderRadius: "0 2px 2px 0" }} />}
-              <span style={{ fontSize: 16 }}>{t.icon}</span>
-              {sidebarOpen && <span style={{ fontSize: 13, color: activeTab === t.id ? "#fff" : "#888780", fontWeight: activeTab === t.id ? 600 : 400 }}>{t.label}</span>}
-            </button>
-          ))}
-        </nav>
-        {/* Logout Button in Sidebar */}
-        <button
-          onClick={async () => {
-            if (auth) {
-              await signOut(auth);
-            }
-            localStorage.removeItem("mock_admin_auth");
-            router.push("/login");
-          }}
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: sidebarOpen ? "12px 16px" : "12px 0",
-            justifyContent: sidebarOpen ? "flex-start" : "center",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            textAlign: "left",
-            borderTop: "0.5px solid #333330",
-            transition: "all 0.2s"
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#2c2c29";
-            const span = e.currentTarget.querySelector('.logout-text');
-            if (span) span.style.color = COLOR.red;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "none";
-            const span = e.currentTarget.querySelector('.logout-text');
-            if (span) span.style.color = "#888780";
-          }}
-        >
-          <span style={{ fontSize: 16 }}>🔒</span>
-          {sidebarOpen && (
-            <span
-              className="logout-text"
-              style={{
-                fontSize: 13,
-                color: "#888780",
-                fontWeight: 600,
-                transition: "color 0.2s"
-              }}
-            >
-              Log Out
-            </span>
-          )}
-        </button>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ padding: "12px 0", background: "none", border: "none", cursor: "pointer", color: "#888780", fontSize: 16, borderTop: "0.5px solid #333330" }}>
-          {sidebarOpen ? "◀" : "▶"}
-        </button>
-      </div>
-
-      {/* Main */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Topbar */}
-        <div style={{ background: "#fff", borderBottom: "0.5px solid #e5e3dc", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#2C2C2A" }}>{TABS.find(t => t.id === activeTab)?.icon} {TABS.find(t => t.id === activeTab)?.label}</div>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <span style={{ fontSize: 11, background: COLOR.greenLight, color: COLOR.green, padding: "4px 10px", borderRadius: 20, fontWeight: 600 }}>● Live Cell</span>
+              <span style={{ fontSize: 11, background: COLOR.saffronLight, color: COLOR.saffronDark, padding: "4px 10px", borderRadius: 20, fontWeight: 600 }}>HI / EN</span>
+              <button
+                onClick={async () => {
+                  if (auth) {
+                    await signOut(auth);
+                  }
+                  localStorage.removeItem("mock_admin_auth");
+                  router.push("/login");
+                }}
+                style={{
+                  fontSize: 11,
+                  background: COLOR.redLight,
+                  color: COLOR.red,
+                  border: `1px solid ${COLOR.red}40`,
+                  padding: "5px 12px",
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+              >
+                🔒 Log Out
+              </button>
+              <div style={{ width: 32, height: 32, borderRadius: "50%", background: COLOR.saffronLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: COLOR.saffronDark }}>RS</div>
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ fontSize: 11, background: COLOR.greenLight, color: COLOR.green, padding: "4px 10px", borderRadius: 20, fontWeight: 600 }}>● Live Cell</span>
-            <span style={{ fontSize: 11, background: COLOR.saffronLight, color: COLOR.saffronDark, padding: "4px 10px", borderRadius: 20, fontWeight: 600 }}>HI / EN</span>
-            <button
-              onClick={async () => {
-                if (auth) {
-                  await signOut(auth);
-                }
-                localStorage.removeItem("mock_admin_auth");
-                router.push("/login");
-              }}
-              style={{
-                fontSize: 11,
-                background: COLOR.redLight,
-                color: COLOR.red,
-                border: `1px solid ${COLOR.red}40`,
-                padding: "5px 12px",
-                borderRadius: 8,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s"
-              }}
-            >
-              🔒 Log Out
-            </button>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: COLOR.saffronLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: COLOR.saffronDark }}>RS</div>
-          </div>
-        </div>
 
-        {/* Content */}
-        <div style={{ flex: 1, overflowY: "auto", padding: 24 }}>
-          <Screen />
+          {/* Content */}
+          <div style={{ flex: 1, overflowY: "auto", padding: 24 }}>
+            <Screen />
+          </div>
         </div>
       </div>
     </div>
