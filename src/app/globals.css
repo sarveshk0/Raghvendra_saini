@@ -1,0 +1,378 @@
+@import "tailwindcss";
+
+/* ============================================================
+   RAGHVENDRA SAINI CAMPAIGN PORTAL — Global Styles
+   Glassmorphism · 3D · Animations · Custom Scrollbar
+   ============================================================ */
+
+:root {
+  --background: #FAFAF7;
+  --foreground: #2C2C2A;
+  --saffron: #EF9F27;
+  --saffron-dark: #BA7517;
+  --green: #1D9E75;
+  --blue: #185FA5;
+  --dark: #1a1a18;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+a, button, input, textarea, select, .badge, img, .mobile-nav-overlay {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0ede5;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #EF9F27, #BA7517);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #BA7517;
+}
+
+/* ============================================================
+   GLASSMORPHISM UTILITIES
+   ============================================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.glass-dark {
+  background: rgba(26, 26, 24, 0.65);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(239, 159, 39, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-saffron {
+  background: rgba(239, 159, 39, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 159, 39, 0.2);
+}
+
+/* ============================================================
+   3D PERSPECTIVE UTILITIES
+   ============================================================ */
+.perspective-800 {
+  perspective: 800px;
+}
+.perspective-1000 {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* ============================================================
+   SCROLL REVEAL KEYFRAMES
+   ============================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================================
+   FLOATING / AMBIENT ANIMATIONS
+   ============================================================ */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-12px) rotate(3deg); }
+}
+
+@keyframes floatX {
+  0%, 100% { transform: translateX(0px); }
+  50%       { transform: translateX(8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 159, 39, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(239, 159, 39, 0);
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes blob-morph {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50%       { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   ANIMATION UTILITY CLASSES
+   ============================================================ */
+.animate-float {
+  animation: floatY 4s ease-in-out infinite;
+}
+
+.animate-float-x {
+  animation: floatX 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+.animate-blob {
+  animation: blob-morph 8s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================================
+   GRADIENT TEXT
+   ============================================================ */
+.gradient-text {
+  background: linear-gradient(135deg, #EF9F27 0%, #BA7517 50%, #1D9E75 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-saffron {
+  background: linear-gradient(135deg, #EF9F27 0%, #FAEEDA 50%, #EF9F27 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ============================================================
+   AMBIENT BACKGROUND BLOB
+   ============================================================ */
+.ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  pointer-events: none;
+  animation: blob-morph 10s ease-in-out infinite, floatY 6s ease-in-out infinite;
+}
+
+/* ============================================================
+   CARD STYLES
+   ============================================================ */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(229, 227, 220, 0.8);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-glass:hover {
+  box-shadow: 0 12px 40px rgba(239, 159, 39, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Top accent border on cards */
+.card-accent-saffron::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #EF9F27, #BA7517);
+}
+
+.card-accent-green::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1D9E75, #0e7a5a);
+}
+
+.card-accent-blue::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #185FA5, #0e3d6e);
+}
+
+/* ============================================================
+   HERO GLOW
+   ============================================================ */
+.hero-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(239, 159, 39, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ============================================================
+   TIMELINE NODE PULSE
+   ============================================================ */
+.timeline-node-active {
+  animation: pulse-glow 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(29, 158, 117, 0.4);
+}
+
+/* ============================================================
+   BADGE STYLES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-saffron {
+  background: rgba(239, 159, 39, 0.12);
+  color: #BA7517;
+  border: 1px solid rgba(239, 159, 39, 0.25);
+}
+
+.badge-green {
+  background: rgba(29, 158, 117, 0.12);
+  color: #1D9E75;
+  border: 1px solid rgba(29, 158, 117, 0.25);
+}
+
+.badge-blue {
+  background: rgba(24, 95, 165, 0.12);
+  color: #185FA5;
+  border: 1px solid rgba(24, 95, 165, 0.25);
+}
+
+/* ============================================================
+   SCROLL TO TOP BUTTON
+   ============================================================ */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #EF9F27, #BA7517);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(239, 159, 39, 0.4);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scroll-top-btn:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 8px 24px rgba(239, 159, 39, 0.5);
+}
+
+.scroll-top-btn:active {
+  transform: scale(0.96);
+}
+
+/* ============================================================
+   MOBILE NAV OVERLAY
+   ============================================================ */
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(26, 26, 24, 0.97);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
