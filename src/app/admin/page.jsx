@@ -579,7 +579,7 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
           {writeModeHi === "easy" ? (
             <div>
               <textarea
-                rows={6}
+                rows={20}
                 value={descHiDraft}
                 onChange={e => handleDescHiDraftChange(e.target.value)}
                 placeholder="अपने विचार यहाँ सामान्य भाषा में लिखें... (जैसे: बुलेट सूची के लिए * का उपयोग करें, या लिंक को सीधे पेस्ट करें)"
@@ -605,7 +605,7 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
               </div>
               <textarea
                 id="thoughtDescHi-textarea"
-                rows={6}
+                rows={20}
                 value={descHi}
                 onChange={e => { setDescHi(e.target.value); setDescHiDraft(htmlToEasyText(e.target.value)); }}
                 placeholder="अपने विचार यहाँ हिंदी HTML में लिखें..."
@@ -633,7 +633,7 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
           {writeModeEn === "easy" ? (
             <div>
               <textarea
-                rows={5}
+                rows={20}
                 value={descEnDraft}
                 onChange={e => handleDescEnDraftChange(e.target.value)}
                 placeholder="Write your thoughts easily... (e.g. use * for bullet lists, 1. for lists, or paste links directly)"
@@ -659,7 +659,7 @@ const Thoughts = ({ thoughts, onSaveThought, onDeleteThought }) => {
               </div>
               <textarea
                 id="thoughtDescEn-textarea"
-                rows={5}
+                rows={20}
                 value={descEn}
                 onChange={e => { setDescEn(e.target.value); setDescEnDraft(htmlToEasyText(e.target.value)); }}
                 placeholder="Write English translation in HTML here..."
@@ -1241,7 +1241,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
               {writeModeDescHi === "easy" ? (
                 <div>
                   <textarea
-                    rows={3}
+                    rows={10}
                     value={descHiDraft}
                     onChange={e => handleDescHiDraftChange(e.target.value)}
                     placeholder="बिन्दकी तहसील में 12,000+ से अधिक नए मतदाताओं को..."
@@ -1263,7 +1263,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
                   </div>
                   <textarea
                     id="descHi-textarea"
-                    rows={3}
+                    rows={10}
                     value={descHi}
                     onChange={e => { setDescHi(e.target.value); setDescHiDraft(htmlToEasyText(e.target.value)); }}
                     placeholder="बिन्दकी तहसील में 12,000+ से अधिक नए मतदाताओं को..."
@@ -1290,7 +1290,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
               {writeModeDescEn === "easy" ? (
                 <div>
                   <textarea
-                    rows={3}
+                    rows={10}
                     value={descEnDraft}
                     onChange={e => handleDescEnDraftChange(e.target.value)}
                     placeholder="Empowered and registered 12,000+ voters in Bindki..."
@@ -1312,7 +1312,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
                   </div>
                   <textarea
                     id="descEn-textarea"
-                    rows={3}
+                    rows={10}
                     value={descEn}
                     onChange={e => { setDescEn(e.target.value); setDescEnDraft(htmlToEasyText(e.target.value)); }}
                     placeholder="Empowered and registered 12,000+ voters in Bindki..."
@@ -1341,7 +1341,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
               {writeModeDetailsHi === "easy" ? (
                 <div>
                   <textarea
-                    rows={6}
+                    rows={18}
                     value={detailsHiDraft}
                     onChange={e => handleDetailsHiDraftChange(e.target.value)}
                     placeholder="<h3><strong>विस्तृत रिपोर्ट</strong></h3><p>यहाँ हिंदी में विवरण लिखें...</p>"
@@ -1367,7 +1367,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
                   </div>
                   <textarea
                     id="detailsHi-textarea"
-                    rows={6}
+                    rows={18}
                     value={detailsHi}
                     onChange={e => { setDetailsHi(e.target.value); setDetailsHiDraft(htmlToEasyText(e.target.value)); }}
                     placeholder="<h3><strong>विस्तृत रिपोर्ट</strong></h3><p>यहाँ हिंदी HTML लिखें...</p>"
@@ -1394,7 +1394,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
               {writeModeDetailsEn === "easy" ? (
                 <div>
                   <textarea
-                    rows={6}
+                    rows={18}
                     value={detailsEnDraft}
                     onChange={e => handleDetailsEnDraftChange(e.target.value)}
                     placeholder="<h3><strong>Detailed Report</strong></h3><p>Write detailed report here...</p>"
@@ -1420,7 +1420,7 @@ const Community = ({ community, onSaveCommunity, onDeleteCommunity }) => {
                   </div>
                   <textarea
                     id="detailsEn-textarea"
-                    rows={6}
+                    rows={18}
                     value={detailsEn}
                     onChange={e => { setDetailsEn(e.target.value); setDetailsEnDraft(htmlToEasyText(e.target.value)); }}
                     placeholder="<h3><strong>Detailed Report</strong></h3><p>Write English HTML here...</p>"
@@ -1749,11 +1749,11 @@ const RSSWork = ({ orgWork, onSaveOrgWork, onDeleteOrgWork }) => {
           <SectionHeader title={editingId ? "✏️ Edit Organizational Achievement" : "🌸 Add Organizational Achievement"} />
           <div style={{ marginBottom: 12 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>ACHIEVEMENT (HINDI / हिंदी)</label>
-            <textarea rows={3} value={titleHi} onChange={e => setTitleHi(e.target.value)} placeholder="e.g. संघ के वरिष्ठ प्रचारक श्री रामचंद्र पांडेय जी के सानिध्य में संगठनात्मक कार्य किया।" style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", boxSizing: "border-box", resize: "vertical" }} />
+            <textarea rows={8} value={titleHi} onChange={e => setTitleHi(e.target.value)} placeholder="e.g. संघ के वरिष्ठ प्रचारक श्री रामचंद्र पांडेय जी के सानिध्य में संगठनात्मक कार्य किया।" style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", boxSizing: "border-box", resize: "vertical" }} />
           </div>
           <div style={{ marginBottom: 12 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: "#888780", display: "block", marginBottom: 4 }}>ACHIEVEMENT (ENGLISH / अंग्रेजी)</label>
-            <textarea rows={3} value={titleEn} onChange={e => setTitleEn(e.target.value)} placeholder="e.g. Conducted organizational work under the guidance of senior RSS Pracharak Shri Ramchandra Pandey Ji." style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", boxSizing: "border-box", resize: "vertical" }} />
+            <textarea rows={8} value={titleEn} onChange={e => setTitleEn(e.target.value)} placeholder="e.g. Conducted organizational work under the guidance of senior RSS Pracharak Shri Ramchandra Pandey Ji." style={{ width: "100%", fontSize: 13, border: "0.5px solid #d3d1c7", borderRadius: 8, padding: "8px 12px", outline: "none", boxSizing: "border-box", resize: "vertical" }} />
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             <button onClick={handleSave} style={{ background: COLOR.green, color: "#fff", border: "none", borderRadius: 6, padding: "8px 14px", fontSize: 12, cursor: "pointer", fontWeight: 600 }}>Save Achievement</button>
