@@ -686,9 +686,9 @@ export default function Home() {
                               {card.icon || "🤝"}
                             </div>
                             <h3 className="text-lg font-bold text-[#2C2C2A] mb-3 group-hover:text-[#EF9F27] transition-colors">{activeTitle}</h3>
-                            <p 
+                            <div 
                               dangerouslySetInnerHTML={{ __html: activeDesc }}
-                              className="text-sm text-[#5F5E5A] leading-relaxed line-clamp-3 mb-4"
+                              className="text-sm text-[#5F5E5A] leading-relaxed line-clamp-3 mb-4 overflow-hidden"
                             />
                           </div>
 
@@ -748,11 +748,15 @@ export default function Home() {
                       <h3 className="text-lg sm:text-xl font-bold text-[#2C2C2A] mb-3 leading-snug group-hover:text-[#BA7517] transition-colors">
                         {lang === "hi" ? post.titleHi : post.titleEn}
                       </h3>
-                      <p className="text-sm text-[#5F5E5A] leading-relaxed mb-6 line-clamp-2 min-h-[40px]">
-                        {lang === "hi" ? post.descHi : post.descEn}
-                      </p>
+                      <div 
+                        dangerouslySetInnerHTML={{ __html: lang === "hi" ? post.descHi : post.descEn }}
+                        className="text-sm text-[#5F5E5A] leading-relaxed mb-6 line-clamp-2 min-h-[40px] overflow-hidden"
+                      />
                     </div>
-                    <button className="text-xs font-bold text-[#BA7517] flex items-center gap-1.5 hover:text-[#EF9F27] transition-colors self-start group-hover:gap-3">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setActiveThought(post); }}
+                      className="text-xs font-bold text-[#BA7517] flex items-center gap-1.5 hover:text-[#EF9F27] transition-colors self-start group-hover:gap-3 cursor-pointer"
+                    >
                       {t.readMore}
                       <span className="transition-transform group-hover:translate-x-1">→</span>
                     </button>
@@ -929,7 +933,7 @@ export default function Home() {
 
                 {/* Rich Text Details Body */}
                 <div 
-                  dangerouslySetInnerHTML={{ __html: activeDetails || `<div class="italic text-gray-500">${activeDesc}</div>` }} 
+                  dangerouslySetInnerHTML={{ __html: activeDetails || activeDesc }} 
                   className="initiative-modal-prose"
                 />
 
